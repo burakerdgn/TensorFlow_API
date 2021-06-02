@@ -1,0 +1,56 @@
+# From the tensorflow/models/research/ directory
+PIPELINE_CONFIG_PATH={C:/Users/burak/Desktop/tfexperiments/Experiment1/faster_rcnn_resnet50_v1_640x640_coco17_tpu-8.config}
+MODEL_DIR={path to model directory}
+python object_detection/model_main_tf2.py \
+    --pipeline_config_path=${PIPELINE_CONFIG_PATH} \
+    --model_dir=${MODEL_DIR} \
+    --alsologtostderr
+    
+    
+# From the tensorflow/models/research/ directory
+PIPELINE_CONFIG_PATH={path to pipeline config file}
+MODEL_DIR={path to model directory}
+CHECKPOINT_DIR=${MODEL_DIR}
+MODEL_DIR={path to model directory}
+python object_detection/model_main_tf2.py \
+    --pipeline_config_path=${PIPELINE_CONFIG_PATH} \
+    --model_dir=${MODEL_DIR} \
+    --checkpoint_dir=${CHECKPOINT_DIR} \
+    --alsologtostderr
+    
+
+## train model    
+python model_main_tf2.py --model_dir=C:/Users/burak/Desktop/tfexperiments/Experiment1/training_process --pipeline_config_path=C:/Users/burak/Desktop/tfexperiments/Experiment1/faster_rcnn_resnet50_v1_640x640_coco17_tpu-8.config
+
+## evaluation
+python model_main_tf2.py --model_dir=C:/Users/burak/Desktop/tfexperiments/Experiment1/training_process --pipeline_config_path=C:/Users/burak/Desktop/tfexperiments/Experiment1/faster_rcnn_resnet50_v1_640x640_coco17_tpu-8.config --checkpoint_dir=C:/Users/burak/Desktop/tfexperiments/Experiment1/training_process
+
+## export model
+python exporter_main_v2.py --input_type image_tensor --pipeline_config_path=faster_rcnn_resnet50_v1_640x640_coco17_tpu-8.config --trained_checkpoint_dir=C:/Users/burak/Desktop/tfexperiments/Experiment1/training_process --output_directory=C:/Users/burak/Desktop/tfexperiments/Experiment1/training_process/exported_models
+
+##Video Test with frozen model
+python detect_objects.py --model_path=C:\Users\burak\Desktop\tfexperiments\Experiment1\training_process\exported_models\saved_model --path_to_labelmap=C:\Users\burak\Desktop\tfexperiments\Experiment1\data\labelmap.pbtxt --video_path=C:\Users\burak\Desktop\tfexperiments\Experiment1\input_video\vid1.mp4 --video_input
+
+## webcam test with frozen model
+python detect_objects.py --model_path=C:\Users\burak\Desktop\tfexperiments\Experiment1\training_process\exported_models\saved_model --path_to_labelmap=C:\Users\burak\Desktop\tfexperiments\Experiment1\data\labelmap.pbtxt --webcam_input
+
+
+
+## cloud adress = "gs://burk-bucket/Experiment1/data/pretrained_model/faster_rcnn_resnet50_v1_640x640_coco17_tpu-8/checkpoint/ckpt-0"
+
+## Google Cloud AI
+# From the tensorflow/models/research/ directory
+cp object_detection/packages/tf2/setup.py .
+gcloud ai-platform jobs submit training object_detection_`date +%m_%d_%Y_%H_%M_%S` \
+    --runtime-version 2.1 \
+    --python-version 3.7 \
+    --job-dir=gs://burk-bucket/Experiment1/training_process \
+    --package-path ./object_detection \
+    --module-name object_detection.model_main_tf2 \
+    --region us-central1 \
+    --master-machine-type n1-highcpu-16 \
+    --master-accelerator count=2,type=nvidia-tesla-v100 \
+    -- \
+    --model_dir=gs://burk-bucket/Experiment1/training_process \
+    --pipeline_config_path=gs://burk-bucket/Experiment1/faster_rcnn_resnet50_v1_640x640_coco17_tpu-8-cloud.config
+
