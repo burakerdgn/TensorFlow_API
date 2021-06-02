@@ -1,5 +1,5 @@
 # TensorFlow_API
-Tensorflow API sample projects
+Tensorflow API sample project
 
 First Tensorflow API demo with the [dataset](https://public.roboflow.com/object-detection/mask-wearing) from Roboflow
 
